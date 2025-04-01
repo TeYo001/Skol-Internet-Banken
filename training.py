@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 def f_x(r: float, n: int, x_n: float) -> float:
     return x_n - (2 * np.pi / 100) * np.sin(2 * np.pi * n / 100) * r
 
-def f_y(r: float, n: int, x_n: float) -> float:
-    return x_n - (2 * np.pi / 100) * np.cos(2 * np.pi * n / 100) * r
+def f_y(r: float, n: int, y_n: float) -> float:
+    return y_n + (2 * np.pi / 100) * np.cos(2 * np.pi * n / 100) * r
 
 DAY = 20
 MONTH = 7
