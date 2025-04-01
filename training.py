@@ -15,7 +15,7 @@ def main():
     r = 20 / 7
     X_n = np.ones(ARRAY_LENGTH)
     Y_n = np.zeros(ARRAY_LENGTH)
-    for n in range(1, 100):
+    for n in range(1, ARRAY_LENGTH):
         X_n[n] = f_x(r, n, X_n[n-1])
         Y_n[n] = f_y(r, n, Y_n[n-1])
     plt.scatter(X_n, Y_n, alpha=0.5, label="test")
