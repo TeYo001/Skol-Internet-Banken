@@ -12,13 +12,14 @@ MONTH = 7
 ARRAY_LENGTH = 100
 
 def main():
-    r = 20 / 7
+    r = DAY / MONTH
     X_n = np.ones(ARRAY_LENGTH)
     Y_n = np.zeros(ARRAY_LENGTH)
-    for n in range(1, ARRAY_LENGTH):
-        X_n[n] = f_x(r, n, X_n[n-1])
-        Y_n[n] = f_y(r, n, Y_n[n-1])
-    plt.scatter(X_n, Y_n, alpha=0.5, label="test")
+    for n in range(ARRAY_LENGTH-1):
+        X_n[n+1] = f_x(r, n, X_n[n])
+        Y_n[n+1] = f_y(r, n, Y_n[n])
+
+    plt.scatter(X_n, Y_n, alpha=0.5)
     plt.title(f"Graph, when r = {DAY}/{MONTH} = {r}")
     plt.xlabel("x_n")
     plt.ylabel("y_n")
