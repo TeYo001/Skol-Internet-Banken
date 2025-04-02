@@ -1,10 +1,14 @@
 ### THIS IS WHERE THE USER END INTERACTION STUFF WILL BE ###
 # Note(TeYo) I'm thinking we implement a basic version of this before we get the more complex rendering in place, for testing of the backend and stuff
 
-import external_imports
+from src.external_imports import *
 
 class MenuStateType(Enum):
     IDLE = 0
+
+@dataclass
+class MenuState:
+    ...
 
 @dataclass
 class MenuState:
@@ -18,10 +22,10 @@ class MenuStateMachine:
     def __init__(self):
         self.all_states = []
         self.current_state_type = MenuStateType.IDLE
-        self.current_state_info = MenuStateInfo
+        self.current_state_info = MenuState
         self.valid_state_change_array = []
 
-    def add_state(self, state: MenuStateType, info: MenuStateInfo) -> bool:
+    def add_state(self, state: MenuState) -> bool:
         ...
 
     def change_state(self, state: MenuStateType) -> bool:

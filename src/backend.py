@@ -1,6 +1,6 @@
 ### THIS IS WHERE THE INNER WORKINGS OF THE ACTUAL BANK PART OF THE PROJECT WILL BE ###
 
-import external_imports
+from src.external_imports import *
 
 @dataclass
 class Money:

@@ -1,15 +1,8 @@
 # the bank
 
-from enum import Enum
-from dataclasses import dataclass
-from collections.abc import Callable
-
-
-### backend ###
-
-### renderer ###
-
-
+from src.backend import *
+from src.menu import *
+from src.render import *
 
 
 # TODO(TeYo)
@@ -17,4 +10,10 @@ from collections.abc import Callable
 # Ränta (konstant på spar)
 # Avkastning (slump ränta) på aktiefond
 
+def main():
+    # Note(TeYo): Just for testing
+    money = Money(100)
+    print(f"money: {money.amount_kr}")
 
+if __name__ == "__main__":
+    main()
