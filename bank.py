@@ -11,9 +11,8 @@ from src.render import *
 # Avkastning (slump ränta) på aktiefond
 
 def main():
-    # Note(TeYo): Just for testing
-    money = Money(100)
-    print(f"money: {money.amount_kr}")
+    menu = menu_init()
+    menu_run(menu)
 
 if __name__ == "__main__":
     main()

@@ -2,6 +2,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt # just for testing
+import time
 from enum import Enum, IntEnum
 from dataclasses import dataclass
 from typing import Dict
