@@ -14,16 +14,13 @@ class MenuState:
 class MenuState:
     state_type: MenuStateType
     valid_state_transitions: list[MenuStateType]
-    state_transition_array: list[Callable[[MenuState], bool]]
-    
+    state_transitions: Dict[MenuStateType, Callable[[MenuState], bool]]
 
 # state machine
 class MenuStateMachine:
     def __init__(self):
-        self.all_states = []
-        self.current_state_type = MenuStateType.IDLE
-        self.current_state_info = MenuState
-        self.valid_state_change_array = []
+        self.all_states: Dict[MenuStateType, MenuState] = {}
+        self.current_state = None
 
     def add_state(self, state: MenuState) -> bool:
         ...
@@ -33,7 +30,8 @@ class MenuStateMachine:
 
 # initializes the menu state machine
 def menu_init() -> MenuStateMachine:
-    ...
+    menu = MenuStateMachine()
+    menu.all_states.append(MenuStateType.IDLE)
 
 def menu_start():
     ...
@@ -59,3 +57,9 @@ def menu_create_account():
 # where the account is visualized and where you can choose what to do once logged in
 def menu_view_account():
     ...
+
+# for testing the menu system individually
+if __name__ == "__main__":
+    menu = menu_init()
+
+
