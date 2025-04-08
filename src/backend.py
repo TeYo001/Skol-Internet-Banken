@@ -26,7 +26,7 @@ class Money:
     def __gt__(self, amount: Money) -> Money:
         return self.amount_kr > amount.amount_kr
 
-class AccountType(Enum):
+class AccountType(IntEnum):
     SAVINGS = 0
     DEBIT = 1
     STOCK_FOND = 2
@@ -65,7 +65,7 @@ def init_bank() -> BankState:
     }
     bank = BankState(
         all_accounts=dict(), 
-        bank_state_save_file_location="nothing.txt",
+        bank_state_save_file_location="bank.save.txt",
         salt_str="123abc",
         next_account_id=0,
         account_type_to_interest=account_type_to_interest,
@@ -145,3 +145,52 @@ def get_account_from_name(account_name: str) -> Account | AccountError:
             continue
         return account
     return AccountError.WRONG_NAME
+
+# NOTE(TeYo): could replace with __repr__, but I generally don't like that way of doing things
+def account_to_save_str(account: Account) -> str:
+    type_str = str(int(account.acc_type))
+    return f"#{type_str}|{account.name}|{account.password_salt_hash}|{account.acc_id}|{account.money.amount_kr}|{account.interest};"
+
+def save_str_to_account(save_str: str) -> Account:
+    # TODO(TeYo): perhaps add some error handling where you return the error
+    element_strs = save_str[1::len(save_str)-1].split("|")
+    if len(element_strs) != 6:
+        print("FIX THIS!")
+        exit(1)
+    return Account(acc_type=AccountType(int(element_strs[0])),
+                   name=element_strs[1],
+                   password_salt_hash=element_strs[2],
+                   acc_id=int(element_strs[3]),
+                   money=Money(int(element_strs[4])),
+                   interest=float(element_strs[5]))
+
+# TODO(TeYo): add error handling here too
+def load_bank():
+    global bank
+    account_strs = None
+    account_count = 0
+    with open(bank.bank_state_save_location, "r+") as file:
+        account_strs = file.read()
+    account_index_ranges = []
+    while True:
+        try:
+            start_idx = account_strs.index("#")
+            end_idx = account_strs.index(";", start_idx, len(account_strs))
+            account_indices.append((start_idx, end_idx))
+        except ValueError as error:
+            break
+    for start_idx, end_idx in account_indices:
+        save_str = account_strs[start_idx:end_idx+1]
+        account = save_str_to_account(save_str)
+        bank.all_accounts[account.acc_id] = account
+
+# TODO(TeYo): errors need handling
+def save_bank():
+    global bank
+    account_strs = ""
+    for account in bank.all_accounts.values():
+        account_strs += account_to_save_str(account)
+    with open(bank.bank_state_save_location, "w+") as file:
+        file.write(account_strs)
+
+

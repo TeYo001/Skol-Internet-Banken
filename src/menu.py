@@ -37,10 +37,12 @@ class MenuStateMachine:
     current_state: MenuState
         
 def menu_run(menu: MenuStateMachine):
+    load_bank()
     while True:
         next = menu.current_state.menu_function(menu)
         # TODO(TeYo): Handle the error
         if type(next) is MenuError:
+            save_bank()
             return
         menu.current_state = menu.all_states[next]
 
