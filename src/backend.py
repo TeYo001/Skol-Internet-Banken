@@ -153,7 +153,7 @@ def account_to_save_str(account: Account) -> str:
 
 def save_str_to_account(save_str: str) -> Account:
     # TODO(TeYo): perhaps add some error handling where you return the error
-    element_strs = save_str[1::len(save_str)-1].split("|")
+    element_strs = save_str[1:len(save_str)-1].split("|")
     if len(element_strs) != 6:
         print("FIX THIS!")
         exit(1)
@@ -169,17 +169,22 @@ def load_bank():
     global bank
     account_strs = None
     account_count = 0
-    with open(bank.bank_state_save_location, "r+") as file:
-        account_strs = file.read()
+    try:
+        with open(bank.bank_state_save_file_location, "r+") as file:
+            account_strs = file.read()
+    except FileNotFoundError as error:
+        return
     account_index_ranges = []
+    search_idx = 0
     while True:
         try:
-            start_idx = account_strs.index("#")
+            start_idx = account_strs.index("#", search_idx, len(account_strs))
             end_idx = account_strs.index(";", start_idx, len(account_strs))
-            account_indices.append((start_idx, end_idx))
+            account_index_ranges.append((start_idx, end_idx))
+            search_idx = start_idx+1
         except ValueError as error:
             break
-    for start_idx, end_idx in account_indices:
+    for start_idx, end_idx in account_index_ranges:
         save_str = account_strs[start_idx:end_idx+1]
         account = save_str_to_account(save_str)
         bank.all_accounts[account.acc_id] = account
@@ -190,7 +195,7 @@ def save_bank():
     account_strs = ""
     for account in bank.all_accounts.values():
         account_strs += account_to_save_str(account)
-    with open(bank.bank_state_save_location, "w+") as file:
+    with open(bank.bank_state_save_file_location, "w+") as file:
         file.write(account_strs)
 
 
