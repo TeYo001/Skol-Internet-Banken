@@ -188,6 +188,7 @@ def load_bank():
         save_str = account_strs[start_idx:end_idx+1]
         account = save_str_to_account(save_str)
         bank.all_accounts[account.acc_id] = account
+    bank.next_account_id = max(bank.all_accounts.keys()) + 1
 
 # TODO(TeYo): errors need handling
 def save_bank():
