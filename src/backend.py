@@ -96,7 +96,8 @@ def logout():
 
 def create_account(name: str, password: str, acc_type: AccountType) -> Account | AccountError:
     global bank
-    # TODO(TeYo): add error checking and name and password restrictions / requirements
+    if not name.isalpha():
+        return AccountError, print("Username should only exist of alphanumeric letters!")
     acc_id = bank.next_account_id
     bank.next_account_id += 1
     account = Account(

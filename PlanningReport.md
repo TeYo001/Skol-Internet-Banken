@@ -19,6 +19,12 @@ Föreläsningar som givits under kursen. Eventuell dokumentation från användar
 ## Tidplan 
 Arbeta på projektet under eftermiddagarna 2-3 gånger i veckan. Eventuellt få feedback vid
 
+25 April, halvtidsavstämning. Vid halvtidsavstämningen ska vi ha börjat på rapporten. 
+
+19 Maj, utkast 1.0. 5 dagar innan ska det vara klart, då gör vi finslipning och sista kontroll på arbetet. 
+
+27 Maj, sista inlämningsdag. Mellan 19-27 så tar vi feedbacken och ordnar det som behöver ordnas. 
+
 ## Pseudo Kod
 
 ### Backend
