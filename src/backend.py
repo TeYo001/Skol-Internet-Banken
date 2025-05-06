@@ -37,6 +37,9 @@ class AccountError(Enum):
     WRONG_NAME = 2
     NOT_LOGGED_IN = 3
     NOT_ENOUGH_MONEY = 4
+    NOT_ALPHANUMERIC = 5
+    NO_NAME = 6
+    NO_PASSWORD = 7
     
 @dataclass
 class Account:
@@ -96,8 +99,12 @@ def logout():
 
 def create_account(name: str, password: str, acc_type: AccountType) -> Account | AccountError:
     global bank
+    if len(name) == 0:
+        return AccountError.NO_NAME
+    if len(password) == 0:
+        return AccountError.NO_PASSWORD
     if not name.isalpha():
-        return AccountError, print("Username should only exist of alphanumeric letters!")
+        return AccountError.NOT_ALPHANUMERIC
     acc_id = bank.next_account_id
     bank.next_account_id += 1
     account = Account(
