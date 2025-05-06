@@ -15,10 +15,23 @@ class MenuStateType(Enum):
     INPUT_MONEY = 5
     WITHDRAW_MONEY = 6
     TRANSFER_MONEY = 7
+    USER_ERROR = 8
 
 class MenuError(Enum):
     EXIT = 0
     PANIC = 1
+    LOGIN_ERROR = 2
+    INVALID_ACCOUNT = 3
+    MONEY_TRANSFER_ERROR = 4
+    MONEY_WITHDRAW_ERROR = 5
+    MONEY_INPUT_ERROR = 6
+    
+
+@dataclass
+class MenuUserErrorInfo:
+    error: MenuError
+    info_str: str
+    return_state: MenuStateType
 
 @dataclass
 class MenuState:
@@ -38,17 +51,33 @@ class MenuStateMachine:
     all_states: Dict[MenuStateType, MenuState]
     current_state: MenuState
     window: cs.window = None
+    user_error_info: MenuUserErrorInfo = None
+
+# This just serves as a simple wrapper for simpler user error handling
+def return_user_error(menu: MenuStateMachine, error: MenuError, info_str: str) -> MenuError:
+    menu.user_error_info = MenuUserErrorInfo(error = error, 
+                                             info_str = info_str,
+                                             return_state = menu.current_state.state_type)
+    return error
 
 def menu_wrapped_run(menu: MenuStateMachine, window: cs.window):
     menu.window = window
     init_window_settings()   
     while True:
         next = menu.current_state.menu_function(menu)
-        # TODO(TeYo): Handle the error
+        # TODO(TeYo): handle panics differently to normal exits
         if type(next) is MenuError:
-            save_bank()
-            return
-        menu.current_state = menu.all_states[next]   
+            match next:
+                case MenuError.EXIT:
+                    save_bank()
+                    return
+                case MenuError.PANIC:
+                    save_bank()
+                    return
+                case _:
+                    menu.current_state = menu.all_states[MenuStateType.USER_ERROR]
+                    continue
+        menu.current_state = menu.all_states[next]
 
 def menu_run(menu: MenuStateMachine):
     load_bank()
@@ -153,10 +182,17 @@ def menu_input_confirm(menu: MenuStateMachine, select_frame: SelectFrame) -> Men
     account = get_current_account()
     if type(account) is AccountError:
         return MenuError.PANIC
-    amount = int(select_frame.options[0].field)
+    try:
+        amount = int(select_frame.options[0].field)
+    except:
+        return return_user_error(menu, MenuError.MONEY_INPUT_ERROR, "Input amounts must be whole numbers.")
     error = input_money(account, Money(amount))
     if not error is None:
-        return MenuError.PANIC
+        match error:
+            case AccountError.NOT_LOGGED_IN:
+                return MenuError.PANIC
+            case _:
+                return MenuError.PANIC
 
 def menu_input_money(menu: MenuStateMachine) -> MenuStateType | MenuError:
     OPTION_COUNT = 2
@@ -177,10 +213,19 @@ def menu_withdraw_confirm(menu: MenuStateMachine, select_frame: SelectFrame) -> 
     account = get_current_account()
     if type(account) is AccountError:
         return MenuError.PANIC
-    amount = int(select_frame.options[0].field)
+    try:
+        amount = int(select_frame.options[0].field)
+    except:
+        return return_user_error(menu, MenuError.MONEY_WITHDRAW_ERROR, "Withdraw amounts must be whole numbers.")
     error = withdraw_money(account, Money(amount))
     if not error is None:
-        return MenuError.PANIC
+        match error:
+            case AccountError.NOT_LOGGED_IN:
+                return MenuError.PANIC
+            case AccountError.NOT_ENOUGH_MONEY:
+                return return_user_error(menu, MenuError.MONEY_WITHDRAW_ERROR, "There is not enough money in your current account to withdraw.")
+            case _:
+                return MenuError.PANIC
 
 def menu_withdraw_money(menu: MenuStateMachine) -> MenuStateType | MenuError:
     OPTION_COUNT = 2
@@ -201,13 +246,26 @@ def menu_transfer_confirm(menu: MenuStateMachine, select_frame: SelectFrame) -> 
     account = get_current_account()
     if type(account) is AccountError:
         return MenuError.PANIC
-    amount = int(select_frame.options[1].field)
+    try:
+        amount = int(select_frame.options[1].field)
+    except:
+        return return_user_error(menu, MenuError.MONEY_TRANSFER_ERROR, "Transfer amounts must be whole numbers.")
     dest_account = get_account_from_name(select_frame.options[0].field)
     if type(dest_account) is AccountError:
-        return MenuError.PANIC
+        match dest_account:
+            case AccountError.WRONG_NAME:
+                return return_user_error(menu, MenuError.MONEY_TRANSFER_ERROR, "The destination account with the given name count not be found.")
+            case _:
+                return MenuError.PANIC
     error = transfer_money(account, dest_amount, Money(amount))
     if not error is None:
-        return MenuError.PANIC
+        match error:
+            case AccountError.NOT_LOGGED_IN:
+                return MenuError.PANIC
+            case AccountError.NOT_ENOUGH_MONEY:
+                return return_user_error(menu, MenuError.MONEY_TRANFER_ERROR, "There is not enough money in your current account to complete the tranfer.")
+            case _:
+                return MenuError.PANIC
 
 def menu_transfer_money(menu: MenuStateMachine) -> MenuStateType | MenuError:
     OPTION_COUNT = 3
@@ -229,8 +287,13 @@ def menu_login_confirm(menu: MenuStateMachine, select_frame: SelectFrame) -> Men
     account_password = select_frame.options[1].field
     account = login(account_name, account_password)
     if type(account) is AccountError:
-        # TODO(TeYo): handle the errors (can't use print with the new rendering system)
-        return MenuError.PANIC
+        match account:
+            case AccountError.WRONG_NAME:
+                return return_user_error(menu, MenuError.LOGIN_ERROR, "There is no user with the given username.")
+            case AccountError.WRONG_PASSWORD:
+                return return_user_error(menu, MenuError.LOGIN_ERROR, "Wrong password.")
+            case _:
+                return MenuError.PANIC
 
 def menu_login(menu: MenuStateMachine) -> MenuStateType | MenuError:
     OPTION_COUNT = 3
@@ -276,12 +339,18 @@ def menu_create_account_confirm(menu: MenuStateMachine, select_frame: SelectFram
         case 4: account_type = AccountType.SAVINGS
         case 5: account_type = AccountType.STOCK_FOND
         case _:
-            # TODO(TeYo): handle error
-            return MenuError.PANIC
+            return return_user_error(menu, MenuError.INVALID_ACCOUNT, "No account type was selected.")
     account = create_account(account_name, account_password, account_type)
     if type(account) is AccountError:
-        # TODO(TeYo): handle error
-        return MenuError.PANIC
+        match account:
+            case AccountError.NO_NAME:
+                return return_user_error(menu, MenuError.INVALID_ACCOUNT, "No name was entered.")
+            case AccountError.NO_PASSWORD:
+                return return_user_error(menu, MenuError.INVALID_ACCOUNT, "No password was entered.")
+            case AccountError.NOT_ALPHANUMERIC:
+                return return_user_error(menu, MenuError.INVALID_ACCOUNT, "The password given was not alphanumeric")
+            case _:
+                return MenuError.PANIC
 
 def menu_create_account(menu: MenuStateMachine) -> MenuStateType | MenuError:
     OPTION_COUNT = 8
@@ -325,6 +394,25 @@ def menu_view_account(menu: MenuStateMachine) -> MenuStateType | MenuError:
                               [None, None, None, None, None],
                               MenuError.EXIT)
 
+def menu_user_error(menu: MenuStateMachine) -> MenuStateType | MenuError:
+    if menu.user_error_info is None:
+        return MenuError.PANIC
+
+    OPTION_COUNT = 3
+    menu_render_default_frame(menu, OPTION_COUNT)
+    select_frame = build_select_frame(menu.window, [
+        SelectTitle(name=f"ERROR TYPE: {menu.user_error_info.error.name}", color = Color.RED),
+        SelectTitle(name=f"INFO: \'{menu.user_error_info.info_str}\'"),
+        SelectButton(name="Press to Continue", select=SelectState.HOVER)
+    ])
+    draw_select_frame(menu.window, select_frame)
+    menu.window.refresh()
+    ret_state = menu.user_error_info.return_state
+    return menu_handle_inputs(menu, select_frame,
+                              [ret_state, ret_state, ret_state],
+                              [None, None, None],
+                              ret_state)
+
 # initializes the menu state machine
 def menu_init() -> MenuStateMachine:
     all_states = {
@@ -336,6 +424,7 @@ def menu_init() -> MenuStateMachine:
         MenuStateType.INPUT_MONEY : MenuState(menu_input_money, MenuStateType.INPUT_MONEY),
         MenuStateType.WITHDRAW_MONEY : MenuState(menu_withdraw_money, MenuStateType.WITHDRAW_MONEY),
         MenuStateType.TRANSFER_MONEY : MenuState(menu_transfer_money, MenuStateType.TRANSFER_MONEY),
+        MenuStateType.USER_ERROR : MenuState(menu_user_error, MenuStateType.USER_ERROR),
     }
     return MenuStateMachine(all_states, all_states[MenuStateType.START])
 
