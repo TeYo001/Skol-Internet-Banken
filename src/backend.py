@@ -40,6 +40,7 @@ class AccountError(Enum):
     NOT_ALPHANUMERIC = 5
     NO_NAME = 6
     NO_PASSWORD = 7
+    ACCOUNT_ALREADY_EXISTS = 8
     
 @dataclass
 class Account:
@@ -62,9 +63,9 @@ class BankState:
 def init_bank() -> BankState:
     # NOTE(TeYo): currently just for testing
     account_type_to_interest = {
-        AccountType.SAVINGS : 0.012,
-        AccountType.DEBIT : 0.004,
-        AccountType.STOCK_FOND : 0.0
+        AccountType.SAVINGS : 1.012,
+        AccountType.DEBIT : 1.004,
+        AccountType.STOCK_FOND : 1.07
     }
     bank = BankState(
         all_accounts=dict(), 
@@ -97,6 +98,13 @@ def logout():
     global bank
     bank.logged_in_account_id = -1
 
+def account_exists(name: str) -> bool:
+    global bank
+    for id, account in bank.all_accounts.items():
+        if name == account.name:
+            return True
+    return False
+
 def create_account(name: str, password: str, acc_type: AccountType) -> Account | AccountError:
     global bank
     if len(name) == 0:
@@ -105,6 +113,9 @@ def create_account(name: str, password: str, acc_type: AccountType) -> Account |
         return AccountError.NO_PASSWORD
     if not name.isalpha():
         return AccountError.NOT_ALPHANUMERIC
+    if account_exists(name):
+        return AccountError.ACCOUNT_ALREADY_EXISTS
+
     acc_id = bank.next_account_id
     bank.next_account_id += 1
     account = Account(
@@ -115,7 +126,7 @@ def create_account(name: str, password: str, acc_type: AccountType) -> Account |
         money=Money(0),
         interest=bank.account_type_to_interest[acc_type])
     bank.all_accounts[acc_id] = account
-    return account
+    return login(name, password)
 
 def input_money(account: Account, amount: Money) -> None | AccountError:
     global bank
@@ -196,6 +207,9 @@ def load_bank():
         save_str = account_strs[start_idx:end_idx+1]
         account = save_str_to_account(save_str)
         bank.all_accounts[account.acc_id] = account
+    if len(bank.all_accounts) == 0:
+        bank.next_account_id = 0
+        return
     bank.next_account_id = max(bank.all_accounts.keys()) + 1
 
 # TODO(TeYo): errors need handling

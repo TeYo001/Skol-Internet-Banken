@@ -160,6 +160,13 @@ def menu_render_default_frame(menu: MenuStateMachine, option_count: int):
     draw_frame(menu.window, frame)
     menu.window.refresh()
 
+def menu_render_account_frame(menu: MenuStateMachine, option_count: int, cash_history: list[int], interest_rate: float):
+    rows, cols = menu.window.getmaxyx()
+    frame = Frame(cols-1, rows-option_count-1)
+    draw_cash_history_with_interest_projection(frame, cash_history, interest_rate)
+    draw_frame(menu.window, frame)
+    menu.window.refresh()
+
 def menu_start(menu: MenuStateMachine) -> MenuStateType | MenuError:
     OPTION_COUNT = 4
     menu_render_default_frame(menu, OPTION_COUNT)
@@ -205,7 +212,7 @@ def menu_input_money(menu: MenuStateMachine) -> MenuStateType | MenuError:
     return menu_handle_inputs(menu, select_frame, 
                               [None, MenuStateType.ACCOUNT_VIEW],
                               [None, lambda: menu_input_confirm(menu, select_frame)],
-                              MenuError.EXIT)
+                              MenuError.ACCOUNT_VIEW)
 
 def menu_withdraw_confirm(menu: MenuStateMachine, select_frame: SelectFrame) -> MenuError | None:
     # TODO(TeYo): error handling
@@ -238,7 +245,7 @@ def menu_withdraw_money(menu: MenuStateMachine) -> MenuStateType | MenuError:
     return menu_handle_inputs(menu, select_frame, 
                               [None, MenuStateType.ACCOUNT_VIEW],
                               [None, lambda: menu_withdraw_confirm(menu, select_frame)],
-                              MenuError.EXIT)
+                              MenuError.ACCOUNT_VIEW)
 
 def menu_transfer_confirm(menu: MenuStateMachine, select_frame: SelectFrame) -> MenuError | None:
     # TODO(TeYo): error handling
@@ -279,7 +286,7 @@ def menu_transfer_money(menu: MenuStateMachine) -> MenuStateType | MenuError:
     return menu_handle_inputs(menu, select_frame, 
                               [None, None, MenuStateType.ACCOUNT_VIEW],
                               [None, None, lambda: menu_transfer_confirm(menu, select_frame)],
-                              MenuError.EXIT)
+                              MenuError.ACCOUNT_VIEW)
 
 def menu_login_confirm(menu: MenuStateMachine, select_frame: SelectFrame) -> MenuError | None:
     account_name = select_frame.options[0].field
@@ -307,7 +314,7 @@ def menu_login(menu: MenuStateMachine) -> MenuStateType | MenuError:
     return menu_handle_inputs(menu, select_frame, 
                               [None, None, MenuStateType.ACCOUNT_VIEW],
                               [None, None, lambda: menu_login_confirm(menu, select_frame)],
-                              MenuError.EXIT)
+                              MenuStateType.START)
 
 def menu_logout(menu: MenuStateMachine) -> MenuStateType | MenuError:
     logout()
@@ -348,6 +355,8 @@ def menu_create_account_confirm(menu: MenuStateMachine, select_frame: SelectFram
                 return return_user_error(menu, MenuError.INVALID_ACCOUNT, "No password was entered.")
             case AccountError.NOT_ALPHANUMERIC:
                 return return_user_error(menu, MenuError.INVALID_ACCOUNT, "The password given was not alphanumeric")
+            case AccountError.ACCOUNT_ALREADY_EXISTS:
+                return return_user_error(menu, MenuError.INVALID_ACCOUNT, "An account with the same name already exists.")
             case _:
                 return MenuError.PANIC
 
@@ -372,13 +381,16 @@ def menu_create_account(menu: MenuStateMachine) -> MenuStateType | MenuError:
     return menu_handle_inputs(menu, select_frame, 
                               [None, None, None, None, None, None, MenuStateType.ACCOUNT_VIEW, MenuError.EXIT],
                               [None, None, None, acc_switch_func, acc_switch_func, acc_switch_func, confirm_func, None],
-                              MenuError.EXIT)
+                              MenuStateType.START)
 
 # where the account is visualized and where you can choose what to do once logged in
 def menu_view_account(menu: MenuStateMachine) -> MenuStateType | MenuError:
     # TODO(TeYo): Add the actual account visualization
     OPTION_COUNT = 5
-    menu_render_default_frame(menu, OPTION_COUNT)
+    account = get_current_account()
+    if type(account) is AccountError:
+        return MenuError.PANIC
+    menu_render_account_frame(menu, OPTION_COUNT, [account.money.amount_kr], account.interest)
     select_frame = build_select_frame(menu.window, [
         SelectButton(name="Input Money", select=SelectState.HOVER),
         SelectButton(name="Withdraw Money"),
@@ -391,7 +403,7 @@ def menu_view_account(menu: MenuStateMachine) -> MenuStateType | MenuError:
     return menu_handle_inputs(menu, select_frame, 
                               [MenuStateType.INPUT_MONEY, MenuStateType.WITHDRAW_MONEY, MenuStateType.TRANSFER_MONEY, MenuStateType.LOGOUT, MenuError.EXIT],
                               [None, None, None, None, None],
-                              MenuError.EXIT)
+                              MenuStateType.LOGOUT)
 
 def menu_user_error(menu: MenuStateMachine) -> MenuStateType | MenuError:
     if menu.user_error_info is None:
