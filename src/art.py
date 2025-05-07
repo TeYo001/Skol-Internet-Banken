@@ -1,0 +1,52 @@
+bank_logo_str = """
+   XXXXXX         XXX      XXX     XXX  XXX    XXX   
+   XXXXXXX        XXX      XXXX    XXX  XXX   XXX    
+   XXXXXXXXX     XXXXX     XXXXX   XXX  XXX  XXX     
+XXXXXX   XXX     XXXXX     XXXXXX  XXX  XXX XXX      
+XXXXXX    XX    XXXXXXX    XXX XXX XXX  XXXXXX       
+   XXXXXXXX     XXX XXX    XXX  XXXXXX  XXXXX        
+   XXXXXXXX    XXXX XXXX   XXX   XXXXX  XXXXX        
+XXXXXX    XX   XXX   XXX   XXX    XXXX  XXXXXX       
+XXXXXX   XXX  XXXXXXXXXXX  XXX     XXX  XXX XXX      
+   XXXXXXXXX  XXX     XXX  XXX     XXX  XXX  XXX     
+   XXXXXXX    XXX     XXX  XXX     XXX  XXX   XXX    
+   XXXXXX     XXX     XXX  XXX     XXX  XXX    XXX   
+                                                     
+XXXXX   XXXXX   XXXXX   XXXXX   XXXXX   XXXXX   XXXXX
+    XXXXX   XXXXX   XXXXX   XXXXX   XXXXX   XXXXX    
+"""
+
+BANK_LOGO_B_STR = """
+   XXXXXX   
+   XXXXXXX  
+   XXXXXXXXX
+XXXXXX   XXX
+XXXXXX    XX
+   XXXXXXXX 
+   XXXXXXXX 
+XXXXXX    XX
+XXXXXX   XXX
+   XXXXXXXXX
+   XXXXXXX  
+   XXXXXX   
+"""
+
+BANK_LOGO_ANK_STR = """
+    XXX      XXX     XXX  XXX    XXX
+    XXX      XXXX    XXX  XXX   XXX 
+   XXXXX     XXXXX   XXX  XXX  XXX  
+   XXXXX     XXXXXX  XXX  XXX XXX   
+  XXXXXXX    XXX XXX XXX  XXXXXX    
+  XXX XXX    XXX  XXXXXX  XXXXX     
+ XXXX XXXX   XXX   XXXXX  XXXXX     
+ XXX   XXX   XXX    XXXX  XXXXXX    
+XXXXXXXXXXX  XXX     XXX  XXX XXX   
+XXX     XXX  XXX     XXX  XXX  XXX  
+XXX     XXX  XXX     XXX  XXX   XXX 
+XXX     XXX  XXX     XXX  XXX    XXX
+"""
+
+BANK_LOGO_SQUIGGLE_STR = """
+XXXXX   XXXXX   XXXXX   XXXXX   XXXXX   XXXXX   XXXXX
+    XXXXX   XXXXX   XXXXX   XXXXX   XXXXX   XXXXX    
+"""
