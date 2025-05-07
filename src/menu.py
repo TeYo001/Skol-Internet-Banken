@@ -156,8 +156,7 @@ def menu_handle_inputs(menu: MenuStateMachine,
 def menu_render_default_frame(menu: MenuStateMachine, option_count: int):
     rows, cols = menu.window.getmaxyx()
     frame = Frame(cols-1,rows-option_count-1)
-    graph = build_data_from_func(lambda x: x**2, list(range(0, 1000)))
-    draw_graph(frame, graph, color=Color.GREEN)
+    draw_bank_logo(frame)
     draw_frame(menu.window, frame)
     menu.window.refresh()
 
