@@ -155,13 +155,13 @@ def draw_cash_history_with_interest_projection(frame: Frame, cash_history: list[
         return
     if cash_history[-1] == 0:
         return
-    projection_length_years=16
+    projection_length_years=8
     width = frame.width - x_margin_size*2
     height = frame.height - bottom_margin_size
     cash_x_adjust_factor = width/2/len(cash_history)
-    cash_y_adjust_factor = height/2/max(cash_history)
-    interest_x_adjust_factor = projection_length_years/width/2
+    interest_x_adjust_factor = projection_length_years/(width/2)
     max_cash_after_interest = calculate_interest(cash_history[-1], interest_rate, projection_length_years)
+    cash_y_adjust_factor = height/2/cash_history[-1]
     #interest_y_adjust_factor = frame.height/max_cash_after_interest
     last_y = 0
     
@@ -185,7 +185,7 @@ def draw_cash_history_with_interest_projection(frame: Frame, cash_history: list[
         frame.set_pixel(x+width//2+x_margin_size, y + bottom_margin_size, Pixel(cs.ACS_BLOCK, Color.YELLOW))
 
     draw_y_axis_labels(frame, cash_history[-1]*2, y_offset=1)
-    draw_x_axis_labels(frame, frame.width//2, x_margin_size, step_size=4, label_count=5)
+    draw_x_axis_labels(frame, frame.width//2, x_margin_size, step_size=2, label_count=5)
 
 def draw_ascii_str(frame: Frame, ascii_str: str, x_offset: int, y_offset: int, color=Color.WHITE):
     x = x_offset
