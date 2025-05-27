@@ -61,7 +61,6 @@ class BankState:
     logged_in_account_id: int # -1 if not logged into any account
 
 def init_bank() -> BankState:
-    # NOTE(TeYo): currently just for testing
     account_type_to_interest = {
         AccountType.SAVINGS : 1.012,
         AccountType.DEBIT : 1.004,
@@ -77,7 +76,6 @@ def init_bank() -> BankState:
     return bank
 
 ### GLOBAL STATE ###
-# NOTE(TeYo): Just for simplicity (might change later if it becomes a problem)
 
 bank = init_bank()
 
