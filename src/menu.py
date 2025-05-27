@@ -212,7 +212,7 @@ def menu_input_money(menu: MenuStateMachine) -> MenuStateType | MenuError:
     return menu_handle_inputs(menu, select_frame, 
                               [None, MenuStateType.ACCOUNT_VIEW],
                               [None, lambda: menu_input_confirm(menu, select_frame)],
-                              MenuError.ACCOUNT_VIEW)
+                              MenuStateType.ACCOUNT_VIEW)
 
 def menu_withdraw_confirm(menu: MenuStateMachine, select_frame: SelectFrame) -> MenuError | None:
     # TODO(TeYo): error handling
@@ -245,7 +245,7 @@ def menu_withdraw_money(menu: MenuStateMachine) -> MenuStateType | MenuError:
     return menu_handle_inputs(menu, select_frame, 
                               [None, MenuStateType.ACCOUNT_VIEW],
                               [None, lambda: menu_withdraw_confirm(menu, select_frame)],
-                              MenuError.ACCOUNT_VIEW)
+                              MenuStateType.ACCOUNT_VIEW)
 
 def menu_transfer_confirm(menu: MenuStateMachine, select_frame: SelectFrame) -> MenuError | None:
     # TODO(TeYo): error handling
@@ -286,7 +286,7 @@ def menu_transfer_money(menu: MenuStateMachine) -> MenuStateType | MenuError:
     return menu_handle_inputs(menu, select_frame, 
                               [None, None, MenuStateType.ACCOUNT_VIEW],
                               [None, None, lambda: menu_transfer_confirm(menu, select_frame)],
-                              MenuError.ACCOUNT_VIEW)
+                              MenuStateType.ACCOUNT_VIEW)
 
 def menu_login_confirm(menu: MenuStateMachine, select_frame: SelectFrame) -> MenuError | None:
     account_name = select_frame.options[0].field
