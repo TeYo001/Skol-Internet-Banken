@@ -1,5 +1,4 @@
 ### THIS IS WHERE THE USER END INTERACTION STUFF WILL BE ###
-# Note(TeYo) I'm thinking we implement a basic version of this before we get the more complex rendering in place, for testing of the backend and stuff
 
 from src.external_imports import *
 from src.backend import *
@@ -83,7 +82,6 @@ def menu_run(menu: MenuStateMachine):
     load_bank()
     cs.wrapper(lambda window: menu_wrapped_run(menu, window))
 
-# TODO(TeYo): add error handling
 def menu_update_on_type(menu: MenuStateMachine, select_frame: SelectFrame, char: str):
     current_option = None
     for option in select_frame.options:
@@ -100,7 +98,6 @@ def menu_update_on_type(menu: MenuStateMachine, select_frame: SelectFrame, char:
     draw_select_frame(menu.window, select_frame)
     menu.window.refresh()
 
-# TODO(TeYo): add error handling
 def menu_handle_inputs(menu: MenuStateMachine,
                        select_frame: SelectFrame, 
                        on_press_state_list: list[MenuState | MenuError | None], # None if pressing that button should be ignored
@@ -184,7 +181,6 @@ def menu_start(menu: MenuStateMachine) -> MenuStateType | MenuError:
                               MenuError.EXIT)
 
 def menu_input_confirm(menu: MenuStateMachine, select_frame: SelectFrame) -> MenuError | None:
-    # TODO(TeYo): error handling
     account = get_current_account()
     if type(account) is AccountError:
         return MenuError.PANIC
@@ -215,7 +211,6 @@ def menu_input_money(menu: MenuStateMachine) -> MenuStateType | MenuError:
                               MenuStateType.ACCOUNT_VIEW)
 
 def menu_withdraw_confirm(menu: MenuStateMachine, select_frame: SelectFrame) -> MenuError | None:
-    # TODO(TeYo): error handling
     account = get_current_account()
     if type(account) is AccountError:
         return MenuError.PANIC
@@ -248,7 +243,6 @@ def menu_withdraw_money(menu: MenuStateMachine) -> MenuStateType | MenuError:
                               MenuStateType.ACCOUNT_VIEW)
 
 def menu_transfer_confirm(menu: MenuStateMachine, select_frame: SelectFrame) -> MenuError | None:
-    # TODO(TeYo): error handling
     account = get_current_account()
     if type(account) is AccountError:
         return MenuError.PANIC
@@ -385,7 +379,6 @@ def menu_create_account(menu: MenuStateMachine) -> MenuStateType | MenuError:
 
 # where the account is visualized and where you can choose what to do once logged in
 def menu_view_account(menu: MenuStateMachine) -> MenuStateType | MenuError:
-    # TODO(TeYo): Add the actual account visualization
     OPTION_COUNT = 5
     account = get_current_account()
     if type(account) is AccountError:

@@ -118,7 +118,7 @@ def number_to_pretty_string(number: int | float) -> str:
 def draw_y_axis_labels(frame: Frame, y_max: int, label_count=10, y_offset=0, color=Color.WHITE):
     for i in range(label_count):
         row_idx = np.clip(i * frame.height // label_count, 0, frame.height-1)
-        number_str = number_to_pretty_string(y_max / label_count * i) # TODO(TeYo): prettify
+        number_str = number_to_pretty_string(y_max / label_count * i)
         for x, ch in enumerate(number_str):
             frame.set_pixel(x, row_idx+y_offset, Pixel(ch, color))
 
@@ -198,7 +198,6 @@ def draw_ascii_str(frame: Frame, ascii_str: str, x_offset: int, y_offset: int, c
         frame.set_pixel(x, y, Pixel(ch, color))
         x += 1
 
-# NOTE(TeYo): very ugly way of doing this but it works and I'm tired
 def draw_bank_logo(frame: Frame):
     TEST = 53
     draw_ascii_str(frame, BANK_LOGO_B_STR, frame.width//2 - 26, frame.height//2 + 7, color=Color.GREEN)
